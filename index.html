@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DressAI — Virtual Try-On Studio</title>
+  <meta name="description" content="Upload your photo, point camera at a dress in store, see yourself wearing it with AI color recommendations."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- NAV -->
+<nav class="glass-nav" id="main-nav">
+  <div class="nav-inner">
+    <div class="nav-logo"><span class="logo-icon">✨</span><span class="logo-text">DressAI</span></div>
+    <div class="nav-links">
+      <a href="#hero" class="nav-link">Home</a>
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+      <a href="#app-section" class="nav-link">Try On</a>
+    </div>
+    <button class="btn-primary nav-cta" onclick="scrollToApp()">Start Now →</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero" class="hero-section">
+  <div class="hero-content">
+    <div class="hero-badge"><span class="badge-dot"></span>AI-Powered Virtual Try-On</div>
+    <h1 class="hero-title">See Yourself in<br/><span class="gradient-text">Any Dress</span><br/>Before You Buy</h1>
+    <p class="hero-subtitle">Upload your photo, point your camera at a dress in-store, and instantly see how it looks on you — with smart color recommendations.</p>
+    <div class="hero-cta-group">
+      <button class="btn-primary btn-large" id="hero-start-btn" onclick="scrollToApp()">🎭 Try It Now</button>
+      <button class="btn-ghost btn-large" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">How It Works</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">98%</span><span class="stat-label">Color Accuracy</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">&lt;3s</span><span class="stat-label">Try-On Speed</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">AI</span><span class="stat-label">Smart Picks</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-mockup">
+      <div class="mockup-screen">
+        <div class="mockup-top-bar">
+          <span class="mockup-dot r"></span><span class="mockup-dot y"></span><span class="mockup-dot g"></span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-side">
+            <div class="avatar-wrap"><div class="avatar-head"></div><div class="avatar-body"></div></div>
+            <span class="mockup-label">You</span>
+          </div>
+          <div class="mockup-arrow">→</div>
+          <div class="mockup-side">
+            <div class="avatar-wrap dressed"><div class="avatar-head"></div><div class="avatar-body dress-overlay"></div></div>
+            <span class="mockup-label">You + Dress</span>
+          </div>
+        </div>
+        <div class="mockup-footer"><span class="score-chip">✓ Great Match — 94%</span></div>
+      </div>
+    </div>
+    <div class="floating-card fc-1">🎨 Color Match: 94%</div>
+    <div class="floating-card fc-2">✨ Warm Tone Detected</div>
+    <div class="floating-card fc-3">👗 Try-On Ready</div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" class="how-section">
+  <div class="section-header">
+    <span class="section-tag">Process</span>
+    <h2>How It Works</h2>
+    <p>Three simple steps to see your perfect look</p>
+  </div>
+  <div class="how-steps">
+    <div class="how-card">
+      <div class="how-icon">📸</div><div class="how-num">01</div>
+      <h3>Upload Your Photo</h3>
+      <p>Upload a clear selfie. Our AI analyzes your skin tone to personalize results.</p>
+    </div>
+    <div class="how-connector">→</div>
+    <div class="how-card">
+      <div class="how-icon">📷</div><div class="how-num">02</div>
+      <h3>Show the Dress</h3>
+      <p>Point camera at any dress in store. Tap Capture — no photo of dress needed!</p>
+    </div>
+    <div class="how-connector">→</div>
+    <div class="how-card">
+      <div class="how-icon">✨</div><div class="how-num">03</div>
+      <h3>See &amp; Decide</h3>
+      <p>See yourself in the dress. Get AI color recommendations to decide confidently.</p>
+    </div>
+  </div>
+</section>
+
+<!-- APP SECTION -->
+<section id="app-section" class="app-section">
+  <div class="section-header">
+    <span class="section-tag">Try-On Studio</span>
+    <h2>Your Virtual Fitting Room</h2>
+    <p>Follow the steps below</p>
+  </div>
+
+  <!-- Step Indicator -->
+  <div class="steps-indicator">
+    <div class="step-item active" id="si-1"><div class="step-circle"><span class="step-num">1</span></div><span class="step-label">Your Photo</span></div>
+    <div class="step-line" id="sl-1"></div>
+    <div class="step-item" id="si-2"><div class="step-circle"><span class="step-num">2</span></div><span class="step-label">Capture Dress</span></div>
+    <div class="step-line" id="sl-2"></div>
+    <div class="step-item" id="si-3"><div class="step-circle"><span class="step-num">3</span></div><span class="step-label">Try-On</span></div>
+    <div class="step-line" id="sl-3"></div>
+    <div class="step-item" id="si-4"><div class="step-circle"><span class="step-num">4</span></div><span class="step-label">Recommendations</span></div>
+  </div>
+
+  <!-- PANEL 1: Upload -->
+  <div class="step-panel active" id="panel-1">
+    <div class="panel-layout">
+      <div class="panel-left">
+        <h3 class="panel-title">📸 Upload Your Photo</h3>
+        <p class="panel-desc">Upload a clear front-facing photo for the best try-on results.</p>
+        <div class="upload-zone" id="upload-zone"
+             onclick="document.getElementById('photo-input').click()"
+             ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+          <div class="upload-idle" id="upload-idle">
+            <div class="upload-svg-icon">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                <circle cx="32" cy="32" r="30" stroke="url(#g1)" stroke-width="1.5"/>
+                <path d="M32 42V22M22 32l10-10 10 10" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs><linearGradient id="g1" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#06b6d4"/>
+                </linearGradient></defs>
+              </svg>
+            </div>
+            <p class="upload-main-text">Drop your photo here</p>
+            <p class="upload-sub-text">or click to browse</p>
+            <span class="upload-format-hint">JPG · PNG · WEBP — Max 10MB</span>
+          </div>
+          <canvas id="photo-preview-canvas" class="photo-preview hidden"></canvas>
+        </div>
+        <input type="file" id="photo-input" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)"/>
+        <div class="tips-box">
+          <p class="tips-title">💡 Tips</p>
+          <ul>
+            <li>✅ Front-facing, good lighting</li>
+            <li>✅ Neutral background</li>
+            <li>✅ Full or upper body visible</li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="glass-card" id="skin-analysis-card">
+          <h4 class="card-title">Skin Tone Analysis</h4>
+          <div class="analysis-placeholder" id="analysis-placeholder">
+            <div class="placeholder-emoji">👤</div>
+            <p>Upload your photo to detect skin tone</p>
+          </div>
+          <div class="analysis-result hidden" id="skin-result">
+            <div class="skin-swatch-row">
+              <div class="skin-swatch" id="skin-swatch"></div>
+              <div class="skin-info">
+                <p class="skin-tone-name" id="skin-tone-name">–</p>
+                <p class="skin-undertone-label" id="skin-undertone">–</p>
+              </div>
+            </div>
+            <div class="palette-section">
+              <p class="palette-label">🎨 Your Best Colors</p>
+              <div class="palette-dots" id="best-palette"></div>
+            </div>
+            <div class="palette-section">
+              <p class="palette-label avoid-label">🚫 Colors to Avoid</p>
+              <div class="palette-dots" id="avoid-palette"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-actions">
+      <button class="btn-primary btn-large" id="btn-step1-next" onclick="goToStep(2)" disabled>Continue to Camera →</button>
+    </div>
+  </div>
+
+  <!-- PANEL 2: Camera -->
+  <div class="step-panel" id="panel-2">
+    <div class="panel-layout">
+      <div class="panel-left">
+        <h3 class="panel-title">📷 Show the Dress on Camera</h3>
+        <p class="panel-desc">Enable camera, point at the dress in store, then click <strong>Capture Dress</strong>.</p>
+        <div class="camera-container" id="camera-container">
+          <div class="camera-off" id="camera-off">
+            <div class="camera-off-icon">📷</div>
+            <p>Camera is disabled</p>
+            <button class="btn-primary" onclick="startCamera()">Enable Camera</button>
+          </div>
+          <div class="camera-live" id="camera-live" style="display:none">
+            <video id="camera-feed" autoplay playsinline muted></video>
+            <div class="cam-overlay">
+              <div class="cam-reticle"><span class="reticle-label">Point at dress</span></div>
+              <div class="cam-live-badge"><span class="live-dot"></span> LIVE</div>
+            </div>
+          </div>
+        </div>
+        <div class="camera-btn-row" id="camera-btn-row" style="display:none">
+          <button class="btn-capture" onclick="captureDress()"><span class="capture-ring"></span>📸 Capture Dress</button>
+          <button class="btn-ghost" onclick="stopCamera()">Stop Camera</button>
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="glass-card">
+          <h4 class="card-title">Captured Dress</h4>
+          <div class="analysis-placeholder" id="dress-placeholder">
+            <div class="placeholder-emoji">👗</div>
+            <p>No dress captured yet</p>
+            <p class="sub-hint">Enable camera and point at dress</p>
+          </div>
+          <div class="capture-result hidden" id="capture-result">
+            <canvas id="dress-thumb-canvas"></canvas>
+            <div class="dress-color-row">
+              <div class="dress-swatch" id="dress-color-swatch"></div>
+              <div>
+                <p class="color-name-label" id="dress-color-name">–</p>
+                <p class="color-hex-label" id="dress-color-hex">–</p>
+              </div>
+            </div>
+            <div class="palette-section">
+              <p class="palette-label">Dress Palette</p>
+              <div class="palette-dots" id="dress-palette-dots"></div>
+            </div>
+            <button class="btn-ghost btn-sm" onclick="retakeCapture()">↺ Retake</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-actions">
+      <button class="btn-ghost" onclick="goToStep(1)">← Back</button>
+      <button class="btn-primary btn-large" id="btn-step2-next" onclick="generateTryOn()" disabled>Generate Try-On ✨</button>
+    </div>
+  </div>
+
+  <!-- PANEL 3: Try-On Result -->
+  <div class="step-panel" id="panel-3">
+    <div class="tryon-header">
+      <h3 class="panel-title">✨ Your Virtual Try-On</h3>
+      <p class="panel-desc">Side-by-side: original you vs. you in the dress</p>
+    </div>
+    <div class="tryon-comparison">
+      <div class="tryon-card">
+        <div class="tryon-card-badge">Original You</div>
+        <canvas id="original-canvas"></canvas>
+      </div>
+      <div class="tryon-vs">VS</div>
+      <div class="tryon-card tryon-featured">
+        <div class="tryon-card-badge featured-badge">✨ You in the Dress</div>
+        <div class="tryon-canvas-wrap">
+          <canvas id="result-canvas"></canvas>
+          <div class="tryon-loading hidden" id="tryon-loading">
+            <div class="loading-spinner"></div>
+            <p class="loading-title">AI Virtual Try-On</p>
+            <p class="loading-status" id="tryon-status">Connecting to AI model…</p>
+            <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+            <p class="loading-note">IDM-VTON is generating your look (20–60s)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tryon-quick-stats">
+      <div class="quick-stat"><span class="qs-icon">🎨</span><div><p class="qs-val" id="qs-score-val">–</p><p class="qs-label">Color Match</p></div></div>
+      <div class="quick-stat"><span class="qs-icon">✨</span><div><p class="qs-val" id="qs-tone-val">–</p><p class="qs-label">Undertone</p></div></div>
+      <div class="quick-stat"><span class="qs-icon">👗</span><div><p class="qs-val" id="qs-verdict-val">–</p><p class="qs-label">Verdict</p></div></div>
+    </div>
+    <div class="panel-actions">
+      <button class="btn-ghost" onclick="goToStep(2)">← Try Another</button>
+      <button class="btn-primary" onclick="downloadResult()" id="download-btn">⬇ Download</button>
+      <button class="btn-primary-outline" onclick="goToStep(4)">Full Report →</button>
+    </div>
+  </div>
+
+  <!-- PANEL 4: Recommendations -->
+  <div class="step-panel" id="panel-4">
+    <h3 class="panel-title">🎨 Dress Recommendation Report</h3>
+    <p class="panel-desc">Personalized based on your skin tone and dress color</p>
+    <div class="rec-layout">
+      <div class="rec-score-card">
+        <div class="score-ring-wrap">
+          <svg class="score-svg" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.08)" stroke-width="10" fill="none"/>
+            <circle cx="60" cy="60" r="50" id="score-arc" stroke="url(#arcGrad)"
+              stroke-width="10" fill="none" stroke-dasharray="314" stroke-dashoffset="314"
+              stroke-linecap="round" transform="rotate(-90 60 60)"/>
+            <defs>
+              <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#06b6d4"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="score-ring-text">
+            <span class="score-big" id="rec-score-num">–</span>
+            <span class="score-pct">%</span>
+          </div>
+        </div>
+        <p class="score-ring-label">Overall Match Score</p>
+        <div class="verdict-badge" id="verdict-badge">–</div>
+      </div>
+      <div class="rec-details">
+        <div class="rec-row glass-card">
+          <h4>Your Skin Tone</h4>
+          <div class="rec-skin-row">
+            <div class="rec-swatch" id="rec-skin-swatch"></div>
+            <div><p id="rec-skin-name">–</p><p class="sub-hint" id="rec-undertone-text">–</p></div>
+          </div>
+        </div>
+        <div class="rec-row glass-card">
+          <h4>Dress Color</h4>
+          <div class="rec-skin-row">
+            <div class="rec-swatch" id="rec-dress-swatch"></div>
+            <div><p id="rec-dress-color-name">–</p><p class="sub-hint" id="rec-dress-hex">–</p></div>
+          </div>
+        </div>
+        <div class="rec-row glass-card">
+          <h4>Color Harmony</h4>
+          <p id="rec-harmony-text">–</p>
+        </div>
+        <div class="rec-row glass-card">
+          <h4>AI Recommendation</h4>
+          <p id="rec-advice-text">–</p>
+        </div>
+        <div class="rec-row glass-card">
+          <h4>Do's &amp; Don'ts</h4>
+          <div class="dos-donts-grid">
+            <div><p class="dos-title">✅ Best Choices</p><div class="palette-dots" id="rec-best-palette"></div></div>
+            <div><p class="dos-title avoid-label">🚫 Avoid</p><div class="palette-dots" id="rec-avoid-palette"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-actions">
+      <button class="btn-ghost" onclick="goToStep(3)">← Back to Try-On</button>
+      <button class="btn-primary" onclick="resetAll()">🔄 Try a New Dress</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="nav-logo"><span class="logo-icon">✨</span><span class="logo-text">DressAI</span></div>
+    <p class="footer-copy">Virtual Try-On Studio — AI-powered fashion decisions</p>
+    <p class="footer-note">Demo build · Deep learning hooks ready for production</p>
+  </div>
+</footer>
+
+<canvas id="capture-buffer" class="hidden"></canvas>
+<script src="js/colorAnalyzer.js"></script>
+<script src="js/recommender.js"></script>
+<script src="js/tryOn.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
