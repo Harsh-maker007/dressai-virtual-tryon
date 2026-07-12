@@ -20,8 +20,7 @@ function scrollToApp() {
 
 function goToStep(n) {
   if (n === 2 && !State.userImg) { showToast('Please upload your photo first'); return; }
-  if (n === 3 && !State.dressCanvas) { showToast('Please capture a dress first'); return; }
-  if (n === 4 && !State.recommendation) { showToast('Please generate the try-on first'); return; }
+  if (n === 3 && !State.recommendation) { showToast('Please wait for the first AI try-on to complete'); return; }
 
   // Update panels
   document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
@@ -131,7 +130,9 @@ function renderSkinResult(data) {
   renderPalette('avoid-palette', data.avoidColors);
 }
 
-// ===================== STEP 2: CAMERA =====================
+// ===================== STEP 2: LIVE AUTO TRY-ON =====================
+let autoLoopActive = false;
+
 async function startCamera() {
   const videoEl = document.getElementById('camera-feed');
   const ok = await CameraModule.start(videoEl);
@@ -139,129 +140,92 @@ async function startCamera() {
     document.getElementById('camera-off').style.display = 'none';
     document.getElementById('camera-live').style.display = 'block';
     document.getElementById('camera-btn-row').style.display = 'flex';
+    autoLoopActive = true;
+    startAutoTryOnLoop();
   } else {
     showToast('Could not access camera. Please allow camera permissions.');
   }
 }
 
 function stopCamera() {
+  autoLoopActive = false;
   CameraModule.stop();
   document.getElementById('camera-live').style.display = 'none';
   document.getElementById('camera-off').style.display = 'flex';
   document.getElementById('camera-btn-row').style.display = 'none';
 }
 
-function captureDress() {
-  if (!CameraModule.isActive()) { showToast('Enable camera first'); return; }
-
+async function startAutoTryOnLoop() {
   const videoEl = document.getElementById('camera-feed');
   const buffer  = document.getElementById('capture-buffer');
-  CameraModule.capture(videoEl, buffer);
-
-  // Flash animation
-  const flash = document.createElement('div');
-  flash.style.cssText = 'position:fixed;inset:0;background:white;opacity:0.5;z-index:9999;pointer-events:none;transition:opacity .4s';
-  document.body.appendChild(flash);
-  setTimeout(() => { flash.style.opacity = '0'; setTimeout(() => flash.remove(), 400); }, 100);
-
-  // Extract dress color
-  State.dressCanvas = buffer;
-  State.dressColor  = ColorAnalyzer.extractDressColor(buffer);
-
-  renderDressCapture(buffer, State.dressColor);
-  stopCamera();
-  document.getElementById('btn-step2-next').disabled = false;
-  showToast('Dress captured! 👗');
-}
-
-function renderDressCapture(canvas, colorData) {
-  document.getElementById('dress-placeholder').classList.add('hidden');
-  const result = document.getElementById('capture-result');
-  result.classList.remove('hidden');
-
-  // Draw thumbnail
-  const thumb = document.getElementById('dress-thumb-canvas');
-  const maxW = 280, aspect = canvas.width / canvas.height;
-  thumb.width = maxW;
-  thumb.height = Math.round(maxW / aspect);
-  thumb.getContext('2d').drawImage(canvas, 0, 0, thumb.width, thumb.height);
-
-  document.getElementById('dress-color-swatch').style.background = colorData.hex;
-  document.getElementById('dress-color-name').textContent = colorData.name;
-  document.getElementById('dress-color-hex').textContent = colorData.hex.toUpperCase();
-
-  renderPalette('dress-palette-dots', colorData.palette);
-}
-
-function retakeCapture() {
-  State.dressCanvas = null;
-  State.dressColor  = null;
-  document.getElementById('capture-result').classList.add('hidden');
-  document.getElementById('dress-placeholder').classList.remove('hidden');
-  document.getElementById('btn-step2-next').disabled = true;
-  startCamera();
-}
-
-// ===================== STEP 3: TRY-ON =====================
-async function generateTryOn() {
-  if (!State.userImg || !State.dressCanvas) return;
-  goToStep(3);
-
-  const origCanvas   = document.getElementById('original-canvas');
+  const statusTxt = document.getElementById('live-status-text');
+  const loading = document.getElementById('tryon-loading');
+  const aiStatus = document.getElementById('tryon-status');
   const resultCanvas = document.getElementById('result-canvas');
-  const loading      = document.getElementById('tryon-loading');
-  const statusEl     = document.getElementById('tryon-status');
+  const btnNext = document.getElementById('btn-step2-next');
 
+  // Set up result canvas size
   const H = 512;
   const W = Math.round(H * (State.userImg.naturalWidth / State.userImg.naturalHeight));
-  origCanvas.width   = resultCanvas.width  = Math.max(W, 360);
-  origCanvas.height  = resultCanvas.height = H;
-
-  loading.classList.remove('hidden');
-  TryOnEngine.drawOriginal(State.userImg, origCanvas);
-
-  const mode = await TryOnEngine.applyTryOn(
-    State.userImg,
-    State.dressColor.hex,
-    State.dressCanvas,
-    resultCanvas,
-    (msg) => { if (statusEl) statusEl.textContent = msg; }
-  );
-
-  loading.classList.add('hidden');
-
-  // Show badge under the result
-  const wrap = document.querySelector('.tryon-card.tryon-featured');
-  const oldBadge = wrap && wrap.querySelector('.ai-badge, .fallback-badge');
-  if (oldBadge) oldBadge.remove();
-  if (wrap) {
-    const badge = document.createElement('div');
-    if (mode === 'ai') {
-      badge.className = 'ai-badge';
-      badge.innerHTML = '✅ Real AI Try-On — IDM-VTON';
-      showToast('✨ AI Try-On complete! This is you in the dress.');
-    } else {
-      badge.className = 'fallback-badge';
-      badge.innerHTML = '⚠️ Preview mode — <strong>start server.py</strong> for real AI';
-      showToast('⚠️ AI server offline — start server.py for real try-on.');
-    }
-    wrap.appendChild(badge);
+  resultCanvas.width = Math.max(W, 360);
+  resultCanvas.height = H;
+  
+  if (resultCanvas.getContext('2d').getImageData(0,0,1,1).data[3] === 0) {
+    TryOnEngine.drawOriginal(State.userImg, resultCanvas);
   }
 
-  State.recommendation = Recommender.recommend(
-    State.skinData.hex,
-    State.skinData.undertone,
-    State.dressColor.hex,
-    State.dressColor.name,
-  );
+  while (autoLoopActive) {
+    if (!CameraModule.isActive()) {
+      await delay(1000);
+      continue;
+    }
 
-  const verdict = State.recommendation.verdict;
-  document.getElementById('qs-score-val').textContent   = State.recommendation.score + '%';
-  document.getElementById('qs-tone-val').textContent    = State.skinData.undertone;
-  document.getElementById('qs-verdict-val').textContent = verdict.text;
+    statusTxt.textContent = "Grabbing frame...";
+    CameraModule.capture(videoEl, buffer);
+    State.dressCanvas = buffer;
+    State.dressColor  = ColorAnalyzer.extractDressColor(buffer);
+
+    statusTxt.textContent = "AI Processing...";
+    loading.classList.remove('hidden');
+
+    try {
+      const mode = await TryOnEngine.applyTryOn(
+        State.userImg,
+        State.dressColor.hex,
+        State.dressCanvas,
+        resultCanvas,
+        (msg) => { if (aiStatus) aiStatus.textContent = msg; }
+      );
+
+      // Run recommendation automatically
+      State.recommendation = Recommender.recommend(
+        State.skinData.hex,
+        State.skinData.undertone,
+        State.dressColor.hex,
+        State.dressColor.name,
+      );
+
+      const verdict = State.recommendation.verdict;
+      document.getElementById('qs-score-val').textContent   = State.recommendation.score + '%';
+      document.getElementById('qs-tone-val').textContent    = State.skinData.undertone;
+      document.getElementById('qs-verdict-val').textContent = verdict.text;
+      
+      btnNext.disabled = false;
+      showToast('✨ Look updated!');
+
+    } catch (e) {
+      console.warn("TryOn auto loop error:", e);
+    }
+    
+    loading.classList.add('hidden');
+    statusTxt.textContent = "Waiting for next frame...";
+    
+    // Wait briefly before grabbing the next frame
+    await delay(3000);
+  }
 }
 
-// ===================== STEP 4: RECOMMENDATIONS =====================
+// ===================== STEP 3: RECOMMENDATIONS =====================
 function renderRecommendations() {
   if (!State.recommendation) return;
   const rec = State.recommendation;
@@ -297,11 +261,11 @@ function renderRecommendations() {
   renderPalette('rec-avoid-palette', rec.avoidColors);
 }
 
-// Override goToStep to trigger rec rendering on step 4
+// Override goToStep to trigger rec rendering on step 3
 const _origGoToStep = goToStep;
 window.goToStep = function(n) {
   _origGoToStep(n);
-  if (n === 4) setTimeout(renderRecommendations, 100);
+  if (n === 3) setTimeout(renderRecommendations, 100);
 };
 
 // ===================== UTILITIES =====================
@@ -359,16 +323,16 @@ function resetAll() {
     '<div class="placeholder-emoji">👤</div><p>Upload your photo to detect skin tone</p>';
   document.getElementById('btn-step1-next').disabled = true;
 
-  // Reset dress
-  document.getElementById('capture-result').classList.add('hidden');
-  document.getElementById('dress-placeholder').classList.remove('hidden');
+  // Reset live mode
+  stopCamera();
   document.getElementById('btn-step2-next').disabled = true;
-
+  const resultCanvas = document.getElementById('result-canvas');
+  if (resultCanvas) resultCanvas.getContext('2d').clearRect(0,0,resultCanvas.width,resultCanvas.height);
+  
   // Reset score arc
   const arc = document.getElementById('score-arc');
   if (arc) { arc.style.transition = 'none'; arc.style.strokeDashoffset = 314; }
 
-  stopCamera();
   goToStep(1);
   showToast('Ready for a new try-on! 🎭');
 }

@@ -115,11 +115,9 @@
   <div class="steps-indicator">
     <div class="step-item active" id="si-1"><div class="step-circle"><span class="step-num">1</span></div><span class="step-label">Your Photo</span></div>
     <div class="step-line" id="sl-1"></div>
-    <div class="step-item" id="si-2"><div class="step-circle"><span class="step-num">2</span></div><span class="step-label">Capture Dress</span></div>
+    <div class="step-item" id="si-2"><div class="step-circle"><span class="step-num">2</span></div><span class="step-label">Live Try-On</span></div>
     <div class="step-line" id="sl-2"></div>
-    <div class="step-item" id="si-3"><div class="step-circle"><span class="step-num">3</span></div><span class="step-label">Try-On</span></div>
-    <div class="step-line" id="sl-3"></div>
-    <div class="step-item" id="si-4"><div class="step-circle"><span class="step-num">4</span></div><span class="step-label">Recommendations</span></div>
+    <div class="step-item" id="si-3"><div class="step-circle"><span class="step-num">3</span></div><span class="step-label">Recommendations</span></div>
   </div>
 
   <!-- PANEL 1: Upload -->
@@ -189,12 +187,12 @@
     </div>
   </div>
 
-  <!-- PANEL 2: Camera -->
+  <!-- PANEL 2: Live Try-On (Combined) -->
   <div class="step-panel" id="panel-2">
     <div class="panel-layout">
       <div class="panel-left">
-        <h3 class="panel-title">📷 Show the Dress on Camera</h3>
-        <p class="panel-desc">Enable camera, point at the dress in store, then click <strong>Capture Dress</strong>.</p>
+        <h3 class="panel-title">📷 Live Dress Camera</h3>
+        <p class="panel-desc">Show a dress to the camera. The AI will automatically process it.</p>
         <div class="camera-container" id="camera-container">
           <div class="camera-off" id="camera-off">
             <div class="camera-off-icon">📷</div>
@@ -204,88 +202,47 @@
           <div class="camera-live" id="camera-live" style="display:none">
             <video id="camera-feed" autoplay playsinline muted></video>
             <div class="cam-overlay">
-              <div class="cam-reticle"><span class="reticle-label">Point at dress</span></div>
-              <div class="cam-live-badge"><span class="live-dot"></span> LIVE</div>
+              <div class="cam-reticle"><span class="reticle-label">Hold dress here</span></div>
+              <div class="cam-live-badge"><span class="live-dot"></span> LIVE AUTO</div>
             </div>
           </div>
         </div>
-        <div class="camera-btn-row" id="camera-btn-row" style="display:none">
-          <button class="btn-capture" onclick="captureDress()"><span class="capture-ring"></span>📸 Capture Dress</button>
-          <button class="btn-ghost" onclick="stopCamera()">Stop Camera</button>
+        <div class="camera-btn-row" id="camera-btn-row" style="display:none; justify-content:space-between">
+            <button class="btn-ghost" onclick="stopCamera()">Stop Camera</button>
+            <span class="live-status-text" id="live-status-text" style="color:var(--accent2); font-weight:600; font-size:0.9rem;">Waiting for camera...</span>
         </div>
       </div>
       <div class="panel-right">
-        <div class="glass-card">
-          <h4 class="card-title">Captured Dress</h4>
-          <div class="analysis-placeholder" id="dress-placeholder">
-            <div class="placeholder-emoji">👗</div>
-            <p>No dress captured yet</p>
-            <p class="sub-hint">Enable camera and point at dress</p>
-          </div>
-          <div class="capture-result hidden" id="capture-result">
-            <canvas id="dress-thumb-canvas"></canvas>
-            <div class="dress-color-row">
-              <div class="dress-swatch" id="dress-color-swatch"></div>
-              <div>
-                <p class="color-name-label" id="dress-color-name">–</p>
-                <p class="color-hex-label" id="dress-color-hex">–</p>
-              </div>
+        <h3 class="panel-title">✨ AI Result</h3>
+        <p class="panel-desc">Updates automatically every ~30s</p>
+        <div class="tryon-card tryon-featured" style="width: 100%; max-width: 400px; margin: 0 auto;">
+          <div class="tryon-canvas-wrap">
+            <canvas id="result-canvas" style="min-height:300px; background:rgba(0,0,0,0.2)"></canvas>
+            <div class="tryon-loading hidden" id="tryon-loading">
+              <div class="loading-spinner"></div>
+              <p class="loading-title">AI Processing...</p>
+              <p class="loading-status" id="tryon-status">Analyzing dress…</p>
             </div>
-            <div class="palette-section">
-              <p class="palette-label">Dress Palette</p>
-              <div class="palette-dots" id="dress-palette-dots"></div>
-            </div>
-            <button class="btn-ghost btn-sm" onclick="retakeCapture()">↺ Retake</button>
           </div>
         </div>
       </div>
     </div>
-    <div class="panel-actions">
-      <button class="btn-ghost" onclick="goToStep(1)">← Back</button>
-      <button class="btn-primary btn-large" id="btn-step2-next" onclick="generateTryOn()" disabled>Generate Try-On ✨</button>
-    </div>
-  </div>
-
-  <!-- PANEL 3: Try-On Result -->
-  <div class="step-panel" id="panel-3">
-    <div class="tryon-header">
-      <h3 class="panel-title">✨ Your Virtual Try-On</h3>
-      <p class="panel-desc">Side-by-side: original you vs. you in the dress</p>
-    </div>
-    <div class="tryon-comparison">
-      <div class="tryon-card">
-        <div class="tryon-card-badge">Original You</div>
-        <canvas id="original-canvas"></canvas>
-      </div>
-      <div class="tryon-vs">VS</div>
-      <div class="tryon-card tryon-featured">
-        <div class="tryon-card-badge featured-badge">✨ You in the Dress</div>
-        <div class="tryon-canvas-wrap">
-          <canvas id="result-canvas"></canvas>
-          <div class="tryon-loading hidden" id="tryon-loading">
-            <div class="loading-spinner"></div>
-            <p class="loading-title">AI Virtual Try-On</p>
-            <p class="loading-status" id="tryon-status">Connecting to AI model…</p>
-            <div class="loading-bar"><div class="loading-bar-fill"></div></div>
-            <p class="loading-note">IDM-VTON is generating your look (20–60s)</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="tryon-quick-stats">
+    
+    <div class="tryon-quick-stats" style="margin-top:2rem">
       <div class="quick-stat"><span class="qs-icon">🎨</span><div><p class="qs-val" id="qs-score-val">–</p><p class="qs-label">Color Match</p></div></div>
       <div class="quick-stat"><span class="qs-icon">✨</span><div><p class="qs-val" id="qs-tone-val">–</p><p class="qs-label">Undertone</p></div></div>
       <div class="quick-stat"><span class="qs-icon">👗</span><div><p class="qs-val" id="qs-verdict-val">–</p><p class="qs-label">Verdict</p></div></div>
     </div>
+
     <div class="panel-actions">
-      <button class="btn-ghost" onclick="goToStep(2)">← Try Another</button>
-      <button class="btn-primary" onclick="downloadResult()" id="download-btn">⬇ Download</button>
-      <button class="btn-primary-outline" onclick="goToStep(4)">Full Report →</button>
+      <button class="btn-ghost" onclick="goToStep(1)">← Back</button>
+      <button class="btn-primary" onclick="downloadResult()" id="download-btn">⬇ Download Frame</button>
+      <button class="btn-primary-outline" id="btn-step2-next" onclick="goToStep(3)" disabled>Full Color Report →</button>
     </div>
   </div>
 
-  <!-- PANEL 4: Recommendations -->
-  <div class="step-panel" id="panel-4">
+  <!-- PANEL 3: Recommendations -->
+  <div class="step-panel" id="panel-3">
     <h3 class="panel-title">🎨 Dress Recommendation Report</h3>
     <p class="panel-desc">Personalized based on your skin tone and dress color</p>
     <div class="rec-layout">
@@ -343,7 +300,7 @@
       </div>
     </div>
     <div class="panel-actions">
-      <button class="btn-ghost" onclick="goToStep(3)">← Back to Try-On</button>
+      <button class="btn-ghost" onclick="goToStep(2)">← Back to Try-On</button>
       <button class="btn-primary" onclick="resetAll()">🔄 Try a New Dress</button>
     </div>
   </div>
