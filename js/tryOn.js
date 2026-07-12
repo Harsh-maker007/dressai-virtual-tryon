@@ -80,7 +80,7 @@ const TryOnEngine = (() => {
           garment_des: "dress",
           is_checked: true,
           is_checked_crop: false,
-          denoise_steps: 15,
+          denoise_steps: 30,
           seed: 42,
         });
 
@@ -161,8 +161,8 @@ const TryOnEngine = (() => {
 
     try {
       // Prepare person canvas (resized for speed)
-      const personCanvas = resizeCanvas(imageElToCanvas(userImg), 512);
-      const dressResized = resizeCanvas(dressCanvas, 512);
+      const personCanvas = resizeCanvas(imageElToCanvas(userImg), 768);
+      const dressResized = resizeCanvas(dressCanvas, 768);
 
       const personBlob = await canvasToBlob(personCanvas);
       const dressBlob  = await canvasToBlob(dressResized);
