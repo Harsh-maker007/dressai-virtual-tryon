@@ -251,11 +251,34 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* RESPONSIVE */
 @media(max-width:900px){
-  .hero-section{grid-template-columns:1fr;padding:100px 6% 60px;text-align:center}
-  .hero-visual{display:none}
+  .hero-section{grid-template-columns:1fr;padding:100px 6% 60px;text-align:center;gap:2rem}
+  .hero-visual{display:flex;transform:scale(0.85);margin-top:1rem}
   .panel-layout{grid-template-columns:1fr}
   .rec-layout{grid-template-columns:1fr}
   .tryon-comparison{flex-direction:column}
   .how-steps{flex-direction:column;align-items:center}
   .how-connector{transform:rotate(90deg)}
+  .nav-links{display:none}
+  .hero-cta-group{justify-content:center}
+  .hero-stats{justify-content:center}
+}
+@media(max-width:600px){
+  .hero-visual{transform:scale(0.65);margin-top:-1rem}
+  .hero-title{font-size:2.2rem}
+  .steps-indicator{flex-wrap:nowrap;overflow-x:auto;padding-bottom:1rem;justify-content:flex-start;padding-left:10px;padding-right:10px;-webkit-overflow-scrolling:touch}
+  .step-item{flex-shrink:0}
+  .step-line{min-width:20px;max-width:40px}
+  .panel-actions{flex-direction:column;align-items:stretch}
+  .panel-actions button{width:100%}
+  .tryon-quick-stats{flex-direction:column}
+  .quick-stat{width:100%}
+  .nav-inner{padding:0 1rem;gap:0.5rem}
+  .nav-logo{font-size:1.2rem}
+  .glass-nav{padding:0}
+  .btn-primary, .btn-ghost, .btn-primary-outline{padding:0.8rem 1.5rem;font-size:1rem}
+  .upload-zone{min-height:200px}
+  .camera-container{min-height:200px}
+  .camera-btn-row{flex-direction:column}
+  .camera-btn-row button{width:100%}
+  .mockup-body{padding:1rem}
 }
