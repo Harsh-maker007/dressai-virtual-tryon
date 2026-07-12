@@ -104,7 +104,7 @@ const TryOnEngine = (() => {
     return { r: parseInt(hex.slice(1,3),16), g: parseInt(hex.slice(3,5),16), b: parseInt(hex.slice(5,7),16) };
   }
 
-  function applyCanvasFallback(userImg, dressHex, dressCanvas, outputCanvas) {
+  function applyCanvasFallback(userImg, dressHex, dressCanvas, outputCanvas, errorMsg = "") {
     const W = outputCanvas.width, H = outputCanvas.height;
     const ctx = outputCanvas.getContext('2d');
     drawFit(userImg, outputCanvas);
@@ -149,8 +149,18 @@ const TryOnEngine = (() => {
       out.data[i+1] = a<10 ? md.data[i+1] : Math.round(md.data[i+1]*oa + (od.data[i+1]*.55+dg*.45)*(1-oa));
       out.data[i+2] = a<10 ? md.data[i+2] : Math.round(md.data[i+2]*oa + (od.data[i+2]*.55+db*.45)*(1-oa));
       out.data[i+3] = md.data[i+3];
-    }
     ctx.putImageData(out, 0, 0);
+
+    // Draw Error Message for Debugging
+    if (errorMsg) {
+      ctx.fillStyle = "rgba(0,0,0,0.7)";
+      ctx.fillRect(0, H - 60, W, 60);
+      ctx.fillStyle = "red";
+      ctx.font = "14px Arial";
+      ctx.fillText("API Error: " + errorMsg.substring(0, 50), 10, H - 40);
+      ctx.fillStyle = "white";
+      ctx.fillText("See DevTools console for details", 10, H - 20);
+    }
   }
 
   /* ─── public API ───────────────────────────────────────── */
@@ -184,8 +194,8 @@ const TryOnEngine = (() => {
       console.warn('[TryOn] AI failed, using canvas fallback:', err.message);
       if (onStatus) onStatus('Using quick preview…');
       drawFit(userImg, outputCanvas);
-      applyCanvasFallback(userImg, dressHex, dressCanvas, outputCanvas);
-      return 'canvas';
+      applyCanvasFallback(userImg, dressHex, dressCanvas, outputCanvas, err.message);
+      return 'canvas:' + err.message;
     }
   }
 
